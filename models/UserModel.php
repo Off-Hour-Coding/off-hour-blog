@@ -2,40 +2,54 @@
 
 use Midspace\Database;
 use HelpersClass\Helpers;
-
+require_once("../_app/Configurations.php");
 require_once("./Database.php");
 require_once("../classes/Helpers.php");
+require_once("../classes/QueryHelper.php");
 
 class User extends Database{
 
     private $Helpers;
+    private $Sql;
+    private $db;
+
+    // limited method to simple select querys
+    private function Select(string $field, string $table, string $condition, array $values) {
+        return $this->db->execute_query($this->Sql->SelectField($field, $table, $condition), $values);
+    }
 
     public function __construct() {
         $this->Helpers = new Helpers();
+        $this->Sql = new QueryHelper();
+        $this->db = new Database(DB_CONFIG);
     }
 
-    public static function Register() {
+    public function Register() {
         
     }
 
-    public static function Auth() {
+    public function Auth() {
 
     }
 
-    public static function DeleteUser() {
+    public function DeleteUser() {
 
     }
 
-    public static function UpdateUserData() {
+    public function UpdateUserData() {
 
     }
 
-    public static function FetchUserByID() {
-
+    public function FetchUserByID(int $id) {
+        return $this->Select("*", "users", "id = :id",  [":id" => $id]);
     }
     
-    public static function FetchUserByName() {
-
+    public function FetchUserByName(string $name) {
+        return $this->Select("*", "users", "name = :name",  [":name" => $name]);
     }
 
 }
+
+$users = new User();
+
+print_r($users->FetchUserByID(1));

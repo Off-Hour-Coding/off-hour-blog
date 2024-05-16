@@ -1,0 +1,9 @@
+{
+    "database": {
+        "host": "localhost",
+        "database": "off_hour_db",
+        "username": "root",
+        "password": ""
+    }
+
+}
