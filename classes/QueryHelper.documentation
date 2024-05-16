@@ -1,0 +1,71 @@
+Uso
+Função createInsertQuery
+
+Esta função cria uma consulta SQL do tipo INSERT INTO com seus placeholders correspondentes.
+
+Exemplo:
+
+php
+
+$data = [
+    "user" => [
+        "name" => ":name",
+        "email" => ":email",
+        "password" => ":password"
+    ]
+];
+
+$insert_data = [
+    ":name" => "kerlon", 
+    ":email" => "kerlon@gmail.com",
+    ":password" => "123456"
+];
+
+$query = createInsertQuery($data, $insert_data);
+
+Função createUpdateQuery
+
+Esta função cria uma consulta SQL do tipo UPDATE com seus placeholders correspondentes.
+
+Exemplo:
+
+php
+
+$data = [
+    "user" => [
+        "name" => ":name",
+        "email" => ":email",
+        "password" => ":password"
+    ]
+];
+
+$update_data = [
+    "name" => "John Doe", 
+    "email" => "john@example.com",
+    "password" => "newpassword"
+];
+
+$condition = "id = 1"; // Condição para o update
+
+$query = createUpdateQuery($data, $update_data, $condition);
+
+Função createSelectQuery
+
+Esta função cria uma consulta SQL do tipo SELECT.
+
+Exemplo:
+
+php
+
+$data = [
+    "user" => [
+        "name" => ":name",
+        "email" => ":email",
+        "password" => ":password"
+    ]
+];
+
+$select_fields = ["id", "name", "email"]; // Campos a serem selecionados
+$select_condition = "id = 1"; // Condição para a seleção (opcional)
+
+$query = createSelectQuery($data, $select_fields, $select_condition);
