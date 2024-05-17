@@ -13,7 +13,7 @@ class Posts {
     private $Helpers;
     private $Sql;
     private $db;
-    private function Select(string $field, string $table, string $condition="", array $values) {
+    private function Select(string $field, string $table, string $condition="", array $values = []) {
         return $this->db->execute_query($this->Sql->SelectField($field, $table, $condition), $values);
     }
     public function __construct()
@@ -25,17 +25,17 @@ class Posts {
     public static function Publishing() {
         
     }
-    public function DeletePost() {
+    public function Delete() {
 
     }
-    public function UpdatePost() {
+    public function Update() {
 
     }
     public function FetchPostById (int $id) {
         return $this->db->execute_query($this->Sql->SelectField("*", "posts", "id = :id"), [":id" => $id]);
     }
-    public function FetchAllPosts () {
-        return $this->Select("*", "posts", "1", []);
+    public function FetchAll () {
+        return $this->Select("*", "posts");
     }
     public function FetchUserPostsByName(string $name) {
         return $this->Select("*", "users", "name = :name",  [":name" => $name]);
@@ -47,3 +47,4 @@ class Posts {
 
 }
 
+$posts = new Posts();

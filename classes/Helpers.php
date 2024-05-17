@@ -16,7 +16,11 @@ class Helpers
         date_default_timezone_set('America/Sao_Paulo'); // Configura o fuso horário para Brasília (BRT)
         return date("H:i:s");
     }
-
+    public function getCurrentDateTime()
+    {
+        date_default_timezone_set('America/Sao_Paulo'); // Configura o fuso horário para Brasília (BRT)
+        return date("Y-m-d H:i:s");
+    }
     public function generateNumKey($len, $min, $max)
     {
         $sequence = array();

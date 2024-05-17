@@ -105,26 +105,24 @@ class QueryHelper
     // );
 
 
-    function createUpdateQuery($data, $update_data, $condition)
+    public function createUpdateQuery(string $table, array $updateFields, array $updateValues, array $conditions)
     {
-        $table = array_keys($data)[0];
-
-        $columns = array_keys($data[$table]);
-
         $set_clause = [];
-        foreach ($columns as $column) {
-            $set_clause[] = "$column = :$column";
+        foreach ($updateFields as $column => $placeholder) {
+            $set_clause[] = "$column = $placeholder";
         }
         $set_clause_str = implode(", ", $set_clause);
 
-        $sql = "UPDATE $table SET $set_clause_str WHERE $condition";
-
-        $values = [];
-        foreach ($columns as $column) {
-            $values[":$column"] = $update_data[$column];
+        $condition_clause = [];
+        foreach ($conditions as $conditionField => $conditionValue) {
+            $condition_clause[] = "$conditionField = :$conditionField";
+            $updateValues[":$conditionField"] = $conditionValue;
         }
+        $condition_clause_str = implode(" AND ", $condition_clause);
 
-        return new QueryObject($sql, $values);
+        $sql = "UPDATE $table SET $set_clause_str WHERE $condition_clause_str";
+
+        return new QueryObject($sql, $updateValues);
     }
 
     public function SelectField(string $field, string $table, string $condition="") {
@@ -139,5 +137,24 @@ class QueryHelper
         return $query;
     }
 
+    public function createDeleteQuery(string $table, array $conditions)
+    {
+        $condition_clause = [];
+        $values = [];
+
+        foreach ($conditions as $conditionField => $conditionValue) {
+            $condition_clause[] = "$conditionField = :$conditionField";
+            $values[":$conditionField"] = $conditionValue;
+        }
+
+        $condition_clause_str = implode(" AND ", $condition_clause);
+
+        $sql = "DELETE FROM $table WHERE $condition_clause_str";
+
+        return new QueryObject($sql, $values);
+    }
+
 }
+
+
 
