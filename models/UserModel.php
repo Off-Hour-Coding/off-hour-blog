@@ -1,12 +1,13 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-use Midspace\Database;
 use HelpersClass\Helpers;
-
-require_once("../_app/Configurations.php");
-require_once("./Database.php");
-require_once("../classes/Helpers.php");
-require_once("../classes/QueryHelper.php");
+use Midspace\Database;
+require_once("Database.php");
+require_once("./classes/Helpers.php");
+require_once("./classes/QueryHelper.php");
 
 class User extends Database
 {
@@ -19,6 +20,25 @@ class User extends Database
     private function Select(string $field, string $table, string $condition, array $values)
     {
         return $this->db->execute_query($this->Sql->SelectField($field, $table, $condition), $values);
+    }
+
+
+    public function update_field(int $id, array $fields)
+    {
+        $updateFields = [];
+        $updateValues = [];
+
+        foreach ($fields as $field => $value) {
+            $updateFields[$field] = ":$field";
+            $updateValues[":$field"] = $value;
+        }
+
+        return $this->Sql->createUpdateQuery(
+            "users",
+            $updateFields,
+            $updateValues,
+            ["id" => $id]
+        );
     }
 
     public function __construct()
@@ -37,6 +57,7 @@ class User extends Database
             [
                 "users" => [
                     "name" => ":name",
+                    "slug" => ":slug",
                     "email" => ":email",
                     "phone" => ":phone",
                     "password" => ":password",
@@ -46,6 +67,7 @@ class User extends Database
             ],
             [
                 ":name" => $name,
+                ":slug" => $this->Helpers->createSlug($name),
                 ":email" => $email,
                 ":phone" => $phone,
                 ":password" => $password,
@@ -73,12 +95,12 @@ class User extends Database
 
         if (empty($user_data->results)) return;
 
-        $hashed_password = $user_data->results[0]->password;
+        $hashed_password = $user_data->results[0]->password; // get the password field of database
 
-        if ($this->Helpers->verifyPassword($password, $hashed_password)) {
-            return $user_data->results[0];
+        if ($this->Helpers->verifyPassword($password, $hashed_password)) { // verify hash_pass and input password 
+            return $user_data->results[0]; // if password is right, return user data
         }
-
+        // if not, will return false or nothing
         return false;
     }
 
@@ -91,51 +113,64 @@ class User extends Database
     public function Update(int $id, string $name, string $email, string $phone)
     {
         $data = $this->Sql->createUpdateQuery(
-            "users", 
+            "users", // will update that table
             [
-                "name" => ":name",
+                "name" => ":name", // the field name will rechieve the placeholder :name because this
+                "slug" => ":slug",
                 "email" => ":email",
                 "phone" => ":phone",
             ],
             [
-                ":name" => $name,
+                ":name" => $name, // and the placeholder :name will rechieve the value of $name
+                ":slug" => $this->Helpers->createSlug($name),
                 ":email" => $email,
                 ":phone" => $phone,
             ],
-            ["id" => $id]
+            ["id" => $id] // here is the condition of query WHERE field id will rechieve the id value
         );
-        
+
         return $this->db->execute_non_query($data->query, $data->placeholders);
     }
 
-    public function update_field(int $id, array $fields)
-    {
-        $updateFields = [];
-        $updateValues = [];
-        
-        foreach ($fields as $field => $value) {
-            $updateFields[$field] = ":$field";
-            $updateValues[":$field"] = $value;
-        }
 
-        return $this->Sql->createUpdateQuery(
-            "users",
-            $updateFields,
-            $updateValues,
-            ["id" => $id]
-        );
-    }
     public function FetchUserByID(int $id)
     {
-        return $this->Select("*", "users", "id = :id",  [":id" => $id]);
+        return $this->Select("id, name, slug, profile_pic", "users", "id = :id",  [":id" => $id]);
+    }
+
+    public function FetchUserBySlug(string $slug)
+    {
+        return $this->Select("*", "users", "slug = :slug",  [":slug" => $slug]);
     }
 
     public function FetchUserByName(string $name)
     {
         return $this->Select("*", "users", "name = :name",  [":name" => $name]);
     }
+
+    public function UpdatePassword(int $user_id, string $new_password)
+    {
+        $data = $this->update_field($user_id, ["password" => $this->Helpers->hashPassword($new_password)]);
+        return $this->db->execute_non_query($data->query, $data->placeholders);
+    }
+
+    public function UpdateProfilePic(int $user_id, int $profile_pic_ref)
+    {
+        $data = $this->update_field($user_id, ["profile_pic" => $profile_pic_ref]);
+        return $this->db->execute_non_query($data->query, $data->placeholders);
+    }
+
+    public function UpdateAccessLevel(int $user_id, int $new_access_level)
+    {
+        $data = $this->update_field($user_id, ["access_level" => $new_access_level]);
+        return $this->db->execute_non_query($data->query, $data->placeholders);
+    }
+
+    public function AuthToken($token) {
+        $id = $this->Helpers->encodeURL($this->Select("id", "users", "auth_token = :token",  [":token" => $token])->results[0]->id);
+        if ($id == "") {
+            return false;
+        }
+        return $id;
+    }
 }
-
-$users = new User();
-
-

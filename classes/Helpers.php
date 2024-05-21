@@ -5,6 +5,28 @@ use DateTime;
 
 class Helpers
 {
+    public static function CreateResponse($type = "success", $message = "", $data = '' ,$status_code = 1010)
+    {
+        $response = array();
+        if ($type == "error") {
+            $response['status'] = 'error';
+            $response['message'] = $message;
+            $response['error'] = true;
+            $response['status_code'] = $status_code;
+  
+        } else {
+            $response['status'] = 'success';
+            $response['message'] = $message;
+            $response['error'] = false;
+            $response['status_code'] = 200;
+            if($data != '') {
+                $response['data'] = $data;
+            }
+          
+        }
+
+        return json_encode($response);
+    }
     public function getCurrentDate()
     {
         date_default_timezone_set('America/Sao_Paulo'); // Configura o fuso horário para Brasília (BRT)

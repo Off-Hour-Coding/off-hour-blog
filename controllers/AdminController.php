@@ -1,4 +1,8 @@
 <?php
+require_once("./_app/Configurations.php"); 
+require_once("./_app/functions.php"); 
+
+
 
 class AdminController extends RenderView {
 
@@ -10,13 +14,7 @@ class AdminController extends RenderView {
 
     }
 
-    public function create_new_topic() {
-        if($_SERVER['REQUEST_METHOD'] != "POST") return;
-        if(isset($_POST[''])) {
-            
-        }
 
-    }
 
     public function update_new_topic() {
 
