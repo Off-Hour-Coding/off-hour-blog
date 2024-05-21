@@ -1,0 +1,19 @@
+
+* {
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+  }
+
+.home {
+    background-color: #31363F;
+}
+
+.card-block {
+    background-color: #222831 !important;
+    color: #F6F5F2 !important;
+    border: none !important;
+}
+
